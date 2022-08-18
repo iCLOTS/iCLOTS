@@ -1,0 +1,125 @@
+"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+
+Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
+Last updated: 2022-07-25 for version 1.0b1
+
+Main menu script directs to every iCLOTS application
+
+"""
+
+import tkinter as tk
+import tkinter.font as font
+from PIL import Image, ImageTk
+from menu import adhesionmenu, occlusionmenu, sct_menu, videomenu
+from help import mainhelp
+from accessoryfn import staytuned
+
+class MainMenu(tk.Tk):
+
+    def __init__(self):
+        super().__init__()
+
+        # App details, subject to change
+        name = 'iCLOTS'
+        name_ext = 'interactive Cellular assay Labeled\nObservation and Tracking experimental Software'
+        tagline = 'Automated analysis software for\nhematology and microfluidic applications'
+        # version = 'v1.0b1'
+        version = 'Pre-release'
+
+        # Fonts
+        titlefont = font.Font(size=24)
+        smallfont = font.Font(size=8)
+
+        # Widgets
+        self.title(name + " main menu")
+        # Software name, title
+        app_label = tk.Label(self, text=name)
+        app_label['font'] = titlefont
+        app_label.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
+        # Program name
+        ext_label = tk.Label(self, text=name_ext)
+        ext_label.grid(row=1, column=0, columnspan=3, padx=5, pady=5)
+        # Logo image
+        logo_canvas = tk.Canvas(self, width=151, height=151)
+        logo_canvas.grid(row=2, column=0, columnspan=3)
+        logoimg = Image.open('/Users/meredithfay/Documents/PycharmProjects/iCLOTS_softwareonly/logo_sm.png')
+        logoimg = ImageTk.PhotoImage(image=logoimg)  # A fix to keep image displayed
+        self.logoimg = logoimg  # " "
+        logo_canvas.create_image(2, 2, anchor='nw', image=logoimg)
+        # Program description text
+        desc_label = tk.Label(self, text=tagline)
+        desc_label.grid(row=3, column=0, columnspan=3, padx=5, pady=5)
+
+        # Adhesion menu button
+        adh_button = tk.Button(self, text="Adhesion", command=self.adhmenu)
+        adh_button.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
+        # Deformability GUI button
+        def_button = tk.Button(self, text="Single cell tracking", command=self.sct_app)
+        def_button.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
+        # Occlusion menu button
+        occ_button = tk.Button(self, text="Multiscale microfluidic accumulation", command=self.occmenu)
+        occ_button.grid(row=7, column=0, columnspan=3, padx=5, pady=5)
+        # Velocity GUI button
+        vel_button = tk.Button(self, text="Velocity profile analysis", command=self.velapp)
+        vel_button.grid(row=8, column=0, columnspan=3, padx=5, pady=5)
+        # Clustering menu button
+        video_button = tk.Button(self, text="Clustering analysis", command=self.clustermenu)
+        video_button.grid(row=9, column=0, columnspan=3, padx=5, pady=5)
+        # Video button
+        video_button = tk.Button(self, text="Video editing", command=self.videomenu)
+        video_button.grid(row=10, column=0, columnspan=3, padx=5, pady=5)
+
+        # Help button
+        help_button = tk.Button(self, text="Help", command=self.gethelp)
+        help_button.grid(row=12, column=0, padx=5, pady=5)
+        # Version, Lam lab text
+        lamlab_label = tk.Label(self, text=version +", Lam Lab")
+        lamlab_label['font'] = smallfont
+        lamlab_label.grid(row=12, column=1, padx=5, pady=5)
+        # Quit button
+        quit_button = tk.Button(self, text="Quit", command=self.destroy)
+        quit_button.grid(row=12, column=2, padx=5, pady=5)
+
+        # Row and column configures
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, weight=1)
+        self.rowconfigure(6, weight=1)
+        self.rowconfigure(7, weight=1)
+        self.rowconfigure(8, weight=1)
+        self.rowconfigure(9, weight=1)
+        self.rowconfigure(10, weight=1)
+        self.rowconfigure(11, weight=1)
+        self.rowconfigure(12, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+
+    def adhmenu(self):
+        adhesionmenu.AdhesionMenu()
+
+    def sct_app(self):
+        sct_menu.SCTMenu()
+
+    def occmenu(self):
+        occlusionmenu.OcclusionMenu()
+
+    def velapp(self):
+        staytuned.StayTuned()
+
+    def videomenu(self):
+        # videomenu.VideoMenu()
+        staytuned.StayTuned()
+
+    def clustermenu(self):
+        staytuned.StayTuned()
+
+    def gethelp(self):
+        mainhelp.HelpDisplay()
+
+
+root = MainMenu()
+root.mainloop()
