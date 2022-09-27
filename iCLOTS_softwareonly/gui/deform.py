@@ -9,6 +9,7 @@ of cells transiting the biophysical flow cytometer device
 """
 
 import tkinter as tk
+from tkinter import messagebox
 import tkinter.font as font
 import os
 import cv2
@@ -50,7 +51,8 @@ class BrightfieldDeformGUI(tk.Toplevel):
         self.h = tk.IntVar(value=0)
 
         # Widgets
-        self.title(name + " brightfield deformability analysis")
+        # self.title(name + " brightfield deformability analysis")
+        self.title(name + " single cell tracking analysis")
 
         # Input single video button
         single_video = tk.Button(self, text="Select single video", command=self.singlefile)
@@ -167,8 +169,11 @@ class BrightfieldDeformGUI(tk.Toplevel):
         expimg_button.grid(row=5, column=4, padx=5, pady=5)
 
         # Quit button
-        quit_button = tk.Button(self, text="Quit", command=self.destroy)
+        quit_button = tk.Button(self, text="Quit", command=self.on_closing)
         quit_button.grid(row=8, column=4, padx=5, pady=5, sticky='E')
+
+        # Tkinter protocol for x close
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Row and column configures
         self.rowconfigure(0, weight=1)
@@ -423,4 +428,25 @@ class BrightfieldDeformGUI(tk.Toplevel):
 
         # Display specified help file
         hp.HelpDisplay()
+
+    # Closing command, clear variables
+    def on_closing(self):
+        """Closing command, clear variables to improve speed"""
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+            # Clear variables
+            filelist = None
+            img = None
+            imgr = None
+            manip = None
+            manipr = None
+            imgr_tk = None
+            manipr_tk = None
+            img_to_label = None
+            frames = None
+            frames_crop = None
+            frames_bgr = None
+            frame_bgr = None
+            frame_bgr_closed = None
+            f = None
 

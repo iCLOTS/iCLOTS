@@ -45,7 +45,7 @@ class RunBFDefAnalysis():
         # Begin trackpy tracking analysis
         tp.quiet()
         f = tp.batch(frames_bgr[:len(frames_bgr)], self.maxdiameter.get(),
-                     minmass=self.minintensity.get(), invert=False);  # Detect particles/cells
+                     minmass=self.minintensity.get(), invert=False, processes=1);  # Detect particles/cells
         # Link particles, cells into dataframe format
         # Search range criteria: must travel no further than 1/3 the channel length in one frame
         # Memory here signifies a particle/cell cannot "disappear" for more than one frame
@@ -95,7 +95,7 @@ class RunBFDefAnalysis():
              'End frame': f_end,
              'Transit time (s)': time,
              'Distance traveled (\u03bcm)': dist,
-             'sDI (\u03bcm/s)': sdi,
+             'Velocity (\u03bcm/s)': sdi,
              'Area (pix)': sizes
              })
 
@@ -115,8 +115,8 @@ class RunBFDefAnalysis():
         if len(f) != 0:
             # Subplot 212 (circularity hist)
             plt.subplot(2, 1, 1)
-            plt.hist(df_video['sDI (\u03bcm/s)'], rwidth=0.8, color='orangered')
-            plt.xlabel('sDI (\u03bcm/s)')
+            plt.hist(df_video['Velocity (\u03bcm/s)'], rwidth=0.8, color='orangered')
+            plt.xlabel('Velocity (\u03bcm/s)')
             plt.ylabel('n')
 
             # Subplot 211 (area hist)
@@ -146,6 +146,7 @@ class RunBFDefAnalysis():
             df_summary = descriptive_statistics(df_video)
             df_summary.insert(0, 'Video', video_basename)
 
+
         GraphTopLevel(df_img)  # Raise graph window
 
     def expnum(self, filelist, umpix, fps, maxdiameter, minintensity, x, y, w, h):
@@ -155,7 +156,7 @@ class RunBFDefAnalysis():
                                 engine='openpyxl')
 
         # Write all data to special page
-        df_video.to_excel(writer, sheet_name='sDI data', index=False)
+        df_video.to_excel(writer, sheet_name='Velocity data', index=False)
 
         # Write all data to special page
         t_sdi.to_excel(writer, sheet_name='Trackpy details', index=False)
@@ -188,7 +189,7 @@ class RunBFDefAnalysis():
 
         pp = plt.figure(figsize=(4, 4), dpi=300)
         df_subset = df_video[['Transit time (s)', 'Distance traveled (\u03bcm)',
-                              'sDI (\u03bcm/s)', 'Area (pix)']]
+                              'Velocity (\u03bcm/s)', 'Area (pix)']]
         sns.pairplot(df_subset)
         plt.savefig(video_basename + '_pairplot.png', dpi=300)
         plt.close()
@@ -197,7 +198,7 @@ class RunBFDefAnalysis():
         """Export image data (.png image) with processing and labeling applied"""
 
         current_dir = os.getcwd()  # Select filepath
-        img_folder = current_dir + '/Results, labeled image data'
+        img_folder = os.path.join(current_dir, 'Results, labeled image data')
 
         if os.path.exists(img_folder):
             shutil.rmtree(img_folder)
@@ -217,6 +218,11 @@ class RunBFDefAnalysis():
                 drawimg.text((f['x'].iloc[j], f['y'].iloc[j]), str(f['particle'].iloc[j]),
                              fill="#ff0000")  # Label
             PILimg.save(image_name + "_labeled.png")  # Save image
+
+        # Close large variables
+        frames_crop = None
+        frames_bgr = None
+        df_video = None
 
 
 class GraphTopLevel(tk.Toplevel):
@@ -264,10 +270,10 @@ def descriptive_statistics(df_input):
     """Function to calculate descriptive statistics for each population, represented as a dataframe"""
 
     dict = {'n cells': len(df_input),
-                  u'Min. sDI (\u03bcm/s)': df_input['sDI (\u03bcm/s)'].min(),
-                  u'Mean sDI (\u03bcm/s)': df_input['sDI (\u03bcm/s)'].mean(),
-                  u'Max. sDI (\u03bcm/s)': df_input['sDI (\u03bcm/s)'].max(),
-                  u'Stdev, sDI (\u03bcm/s)': df_input['sDI (\u03bcm/s)'].std(),
+                  u'Min. velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].min(),
+                  u'Mean velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].mean(),
+                  u'Max. velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].max(),
+                  u'Stdev, velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].std(),
                   u'Min. area (pix)': df_input['Area (pix)'].min(),
                   u'Mean area (pix)': df_input['Area (pix)'].mean(),
                   u'Max. area (pix)': df_input['Area (pix)'].max(),

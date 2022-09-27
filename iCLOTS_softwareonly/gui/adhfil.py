@@ -11,6 +11,7 @@ A later version of this application will optionally quantify a second stain indi
 """
 
 import tkinter as tk
+from tkinter import messagebox
 import tkinter.font as font
 import os
 import cv2
@@ -233,8 +234,11 @@ class FilAdhesionGUI(tk.Toplevel):
         # expimg_button.grid(row=9, column=4, padx=5, pady=5)
 
         # Quit button
-        quit_button = tk.Button(self, text="Quit", command=self.destroy)
+        quit_button = tk.Button(self, text="Quit", command=self.on_closing)
         quit_button.grid(row=12, column=4, padx=5, pady=5, sticky='E')
+
+        # Tkinter protocol for x close
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Row and column configures
         self.rowconfigure(0, weight=1)
@@ -535,4 +539,23 @@ class FilAdhesionGUI(tk.Toplevel):
 
         # Display specified help file
         hp.HelpDisplay()
+
+    # Closing command, clear variables
+    def on_closing(self):
+        """Closing command, clear variables to improve speed"""
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+            # Clear variables
+            filelist = None
+            img = None
+            imgr = None
+            manip = None
+            manipr = None
+            imgr_tk = None
+            manipr_tk = None
+            pimg = None
+            pimg_t = None
+            label_img = None
+            df = None
+            df_filt = None
 

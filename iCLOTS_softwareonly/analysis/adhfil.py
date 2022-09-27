@@ -241,6 +241,18 @@ class RunAdhFilAnalysis():
             df_image.insert(0, 'Image', imgbasename)
             df_summary = df_summary.append(df_image, ignore_index=True)
 
+            # Clear image variables
+            img = None
+            pimg = None
+            pimg_t = None
+            p_label_img = None
+            p_props = None
+            p_df = None
+            p_df_filt = None
+            img_tolabel = None
+            t_tolabel = None
+            graphimg = None
+
 
         # Raise toplevel to show graphs
         GraphTopLevel(df_img)
@@ -355,6 +367,7 @@ class RunAdhFilAnalysis():
         plt.savefig('All-data_multicolor_pairplot.png', dpi=300)
         plt.close()
 
+
     def expimgs(self):
         """Export image data (.png image) with processing and labeling applied"""
 
@@ -362,7 +375,7 @@ class RunAdhFilAnalysis():
 
         if current_dir.split('/')[-1] == 'Results, graphical data':
             current_dir = os.path.dirname(current_dir)
-        img_folder = current_dir + '/Results, labeled image data'
+        img_folder = os.path.join(current_dir, 'Results, labeled image data')
 
         if os.path.exists(img_folder):
             shutil.rmtree(img_folder)
@@ -375,6 +388,12 @@ class RunAdhFilAnalysis():
             cv2.imwrite(df_img['name'].iloc[j] + '_original_image.png', array_orig)
             array_thresh = cv2.cvtColor((df_img['img thresh'].iloc[j][0]).astype(np.uint8), cv2.COLOR_RGB2BGR)
             cv2.imwrite(df_img['name'].iloc[j] + '_threshold_image.png', array_thresh)
+
+        # Clear variables
+        df_all = None
+        df_all_subset = None
+        df_summary = None
+        df_summary_hold = None
 
 class GraphTopLevel(tk.Toplevel):
     def __init__(self, df_img):

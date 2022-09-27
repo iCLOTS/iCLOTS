@@ -124,6 +124,10 @@ class RunAdhBrightfieldAnalysis():
             df_image.insert(0, 'Image', imgbasename)
             df_summary = df_summary.append(df_image, ignore_index=True)
 
+            # Clear image variables
+            img = None
+            img_gray = None
+
         GraphTopLevel(df_img)  # Raise graph window
 
     def expnum(self, filelist, umpix, maxdiameter, minintensity, invert):
@@ -182,7 +186,7 @@ class RunAdhBrightfieldAnalysis():
         current_dir = os.getcwd()  # Select filepath
         if current_dir.split('/')[-1] == 'Results, labeled image data':
             current_dir = os.path.dirname(current_dir)
-        graph_folder = current_dir + '/Results, graphical data'
+        graph_folder = os.path.join(current_dir, 'Results, graphical data')
 
         if os.path.exists(graph_folder):
             shutil.rmtree(graph_folder)
@@ -228,7 +232,7 @@ class RunAdhBrightfieldAnalysis():
 
         if current_dir.split('/')[-1] == 'Results, graphical data':
             current_dir = os.path.dirname(current_dir)
-        img_folder = current_dir + '/Results, labeled image data'
+        img_folder = os.path.join(current_dir, 'Results, labeled image data')
 
         if os.path.exists(img_folder):
             shutil.rmtree(img_folder)
@@ -239,6 +243,11 @@ class RunAdhBrightfieldAnalysis():
         for j in range(len(df_img)):
             array_orig = cv2.cvtColor((df_img['img orig'].iloc[j][0]).astype(np.uint8), cv2.COLOR_RGB2BGR)
             cv2.imwrite(df_img['name'].iloc[j] + '_original_image.png', array_orig)
+
+        # Clear variables
+        df_all = None
+        df_summary = None
+        df_summary_hold = None
 
 
 class GraphTopLevel(tk.Toplevel):
