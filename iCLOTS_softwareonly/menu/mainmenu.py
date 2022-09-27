@@ -1,7 +1,7 @@
 """iCLOTS is a free software created for the analysis of common hematology workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
-Last updated: 2022-07-25 for version 1.0b1
+Last updated: 2022-09-06 for version 1.0b1
 
 Main menu script directs to every iCLOTS application
 
@@ -9,6 +9,8 @@ Main menu script directs to every iCLOTS application
 
 import tkinter as tk
 import tkinter.font as font
+import sys
+import os
 from PIL import Image, ImageTk
 from menu import adhesionmenu, occlusionmenu, sct_menu, videomenu
 from help import mainhelp
@@ -41,8 +43,11 @@ class MainMenu(tk.Tk):
         ext_label.grid(row=1, column=0, columnspan=3, padx=5, pady=5)
         # Logo image
         logo_canvas = tk.Canvas(self, width=151, height=151)
+        # logo_canvas = tk.Canvas(self, width=1, height=1)
         logo_canvas.grid(row=2, column=0, columnspan=3)
-        logoimg = Image.open('/Users/meredithfay/Documents/PycharmProjects/iCLOTS_softwareonly/logo_sm.png')
+        new_path = self.resource_path('logo_sm.png')
+        # logoimg = Image.open('/Users/meredithfay/Documents/PycharmProjects/iCLOTS_softwareonly/logo_sm.png')
+        logoimg = Image.open(new_path)
         logoimg = ImageTk.PhotoImage(image=logoimg)  # A fix to keep image displayed
         self.logoimg = logoimg  # " "
         logo_canvas.create_image(2, 2, anchor='nw', image=logoimg)
@@ -120,6 +125,25 @@ class MainMenu(tk.Tk):
     def gethelp(self):
         mainhelp.HelpDisplay()
 
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource, needed to display logo in .app"""
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
+# def resource_path(relative_path):
+#     """ Get absolute path to resource, needed to display logo in .app"""
+#     try:
+#         # PyInstaller creates a temp folder and stores path in _MEIPASS
+#         base_path = sys._MEIPASS
+#     except Exception:
+#         base_path = os.path.abspath(".")
+#
+#     return os.path.join(base_path, relative_path)
 
 root = MainMenu()
 root.mainloop()

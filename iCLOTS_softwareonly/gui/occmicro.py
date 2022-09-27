@@ -13,6 +13,7 @@ A later version of this application will incorporate channel detection for brigh
 """
 
 import tkinter as tk
+from tkinter import messagebox
 import tkinter.font as font
 import os
 import glob
@@ -195,8 +196,11 @@ class MicrochannelOccGUI(tk.Toplevel):
         # expimg_button.grid(row=9, column=7, padx=5, pady=5)
 
         # Quit button
-        quit_button = tk.Button(self, text="Quit", command=self.destroy)
+        quit_button = tk.Button(self, text="Quit", command=self.on_closing)
         quit_button.grid(row=12, column=7, padx=5, pady=5, sticky='E')
+
+        # Tkinter protocol for x close
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Row and column configures
         self.rowconfigure(0, weight=1)
@@ -552,3 +556,35 @@ class MicrochannelOccGUI(tk.Toplevel):
 
         # Display specified help file
         hp.HelpDisplay()
+
+    # Closing command, clear variables
+    def on_closing(self):
+        """Closing command, clear variables to improve speed"""
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+            # Clear variables
+            filelist = None
+            img = None
+            imgr = None
+            crop = None
+            imgrs = None
+            imgrs_rgb = None
+            imgrs_tk = None
+            img_th_red = None
+            img_th_green = None
+            img_th_blue = None
+            map_bin = None
+            mapbin_ext = None
+            layered_arr = None
+            mapbin_tl = None
+            imgrs_map = None
+            imgrs_map_tk = None
+            mapbin_red = None
+            mapbin_green = None
+            mapbin_blue = None
+            imgrs_red = None
+            imgrs_green = None
+            imgrs_blue = None
+            imgrs_red_tk = None
+            imgrs_blue_tk = None
+            imgrs_green_tk = None

@@ -291,6 +291,17 @@ class RunOccAccMicroAnalysis():
         graphs.canvas.draw()
         graphimg = np.frombuffer(graphs.canvas.tostring_rgb(), dtype=np.uint8)
         graphimg = graphimg.reshape(graphs.canvas.get_width_height()[::-1] + (3,))
+
+        # Clear image variables
+        img = None
+        crop = None
+        img_th_red = None
+        img_th_blue = None
+        img_th_green = None
+        mapbin = None
+        mapbin_ext = None
+        layered_arr = None
+
         # Raise toplevel to show graphs
         GraphTopLevel(graphimg)
 
@@ -362,7 +373,7 @@ class RunOccAccMicroAnalysis():
 
         # if 'Results' in current_dir.split('/')[-1]:
         #     current_dir = os.path.dirname(current_dir)
-        img_folder = current_dir + '/Results, labeled image data'
+        img_folder = os.path.join(current_dir, 'Results, labeled image data')
 
         if os.path.exists(img_folder):
             shutil.rmtree(img_folder)
@@ -373,6 +384,12 @@ class RunOccAccMicroAnalysis():
         for j in range(len(df_colors)):
             array = (df_colors['img'].iloc[j]).astype('uint8')
             cv2.imwrite(df_colors['name'].iloc[j] + '_' + df_colors['color'].iloc[j] + '_image.png', array)
+
+        # Clear large dataframe variables
+        df = None
+        df_img = None
+        df_summary_all = None
+        df_frame = None
 
 
 class GraphTopLevel(tk.Toplevel):
