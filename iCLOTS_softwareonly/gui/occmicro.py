@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic umpworkflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-07-18 for version 1.0b1
@@ -53,7 +53,7 @@ class MicrochannelOccGUI(tk.Toplevel):
         self.analysisbool = tk.BooleanVar(value=False)  # To indicate if final analysis has been run
 
         # Widgets
-        self.title(name + " microchannel occlusion and accumulation analysis")
+        self.title(name + " microchannel accumulation and occlusion analysis")
 
         # Input single image button
         single_button = tk.Button(self, text="Select single image", command=self.singlefile)
@@ -158,7 +158,7 @@ class MicrochannelOccGUI(tk.Toplevel):
         self.blue_canvas.grid_forget()
 
         # Help button
-        help_button = tk.Button(self, text="Help", command=self.help)
+        help_button = tk.Button(self, text="Tutorial", command=self.help)
         help_button.grid(row=12, column=0, padx=5, pady=5, sticky='W')
 
         # Scale
@@ -243,6 +243,9 @@ class MicrochannelOccGUI(tk.Toplevel):
 
         # Call function to display image
         self.displayimg(filename)
+        self.img_scale.grid_forget()
+
+        self.analysisbool.set(False)  # Indicate analysis has been run
 
     # Choose folder of images, return sorted list
     def dirfile(self):
@@ -264,6 +267,8 @@ class MicrochannelOccGUI(tk.Toplevel):
         self.img_scale['to'] = len(filelist)
         self.img_scale.grid(row=11, column=2, columnspan=6, padx=5, pady=5)
 
+        self.analysisbool.set(False)  # Indicate analysis has been run
+
     # Choose ROI with microchannels
     def chooseroi(self, filename):
         """Choose region of interest, ideally, straight portions of microchannel(s) using a draggable rectangle
@@ -273,7 +278,7 @@ class MicrochannelOccGUI(tk.Toplevel):
         # Read image
         imgarray = cv2.imread(filename)
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Image", imgarray, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest", imgarray, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         x = int(r[0])  # Take result of selectROI and put into a variable
         y = int(r[1])  # " "
         w = int(r[2])  # " "

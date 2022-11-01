@@ -20,12 +20,12 @@ warnings.filterwarnings("ignore", module="trackpy")
 from PIL import Image, ImageTk
 import numpy as np
 from help import single_cell_tracking as hp
-from analysis import single_cell_tracking as an
+from analysis import sct_fluor as an
 from accessoryfn import chooseinput, error
 import datetime
 
 
-class BrightfieldSCTGUI(tk.Toplevel):
+class FluorSCTGUI(tk.Toplevel):
 
     def __init__(self):
         super().__init__()
@@ -41,7 +41,6 @@ class BrightfieldSCTGUI(tk.Toplevel):
         self.umpix = tk.StringVar(value='1')  # micron-to-pixel ratio
         self.fps = tk.StringVar(value='1')  # Frames per second imaging rate
         self.maxdiameter = tk.IntVar(value=15)  # maximum diameter of cells, must be odd integer
-        self.minintensity = tk.IntVar(value=1000)  # minimum intensity of cells
         self.search_range = tk.IntVar(value=60)  # search range for individual cells
         self.min_dist = tk.IntVar(value=100)  # minimum distance a cell must travel to be recorded
         self.analysisbool = tk.BooleanVar(value=False)  # To indicate if final analysis has been run
@@ -101,27 +100,10 @@ class BrightfieldSCTGUI(tk.Toplevel):
             )
         max_diam.grid(row=4, column=1, padx=5, pady=5)
 
-        # Minimum intensity label
-        min_int_label = tk.Label(self, text="Minimum\nintensity (a.u.)")
-        min_int_label['font'] = smallfont
-        min_int_label.grid(row=5, column=0, padx=5, pady=5)
-        # Maximum area spinbox
-        min_int = tk.Spinbox(
-            self,
-            from_=0,
-            to=50000,
-            increment=50,
-            textvariable=self.minintensity,
-            width=6,
-            wrap=True,
-            command=self.changeparameter
-            )
-        min_int.grid(row=5, column=1, padx=5, pady=5)
-
         # Search range label
         search_label = tk.Label(self, text="Search range\n(pix))")
         search_label['font'] = smallfont
-        search_label.grid(row=6, column=0, padx=5, pady=5)
+        search_label.grid(row=5, column=0, padx=5, pady=5)
         # Search range spinbox
         search_spin = tk.Spinbox(
             self,
@@ -133,12 +115,12 @@ class BrightfieldSCTGUI(tk.Toplevel):
             wrap=True,
             command=self.changeparameter
             )
-        search_spin.grid(row=6, column=1, padx=5, pady=5)
+        search_spin.grid(row=5, column=1, padx=5, pady=5)
 
         # Min. distance label
         min_dist_label = tk.Label(self, text="Min. distance\ntraveled (pix))")
         min_dist_label['font'] = smallfont
-        min_dist_label.grid(row=7, column=0, padx=5, pady=5)
+        min_dist_label.grid(row=6, column=0, padx=5, pady=5)
         # Min. distance spinbox
         min_dist_spin = tk.Spinbox(
             self,
@@ -150,11 +132,11 @@ class BrightfieldSCTGUI(tk.Toplevel):
             wrap=True,
             command=self.changeparameter
             )
-        min_dist_spin.grid(row=7, column=1, padx=5, pady=5)
+        min_dist_spin.grid(row=6, column=1, padx=5, pady=5)
 
         # Help button
         help_button = tk.Button(self, text="Tutorial", command=self.help)
-        help_button.grid(row=9, column=0, padx=5, pady=5, sticky='W')
+        help_button.grid(row=8, column=0, padx=5, pady=5, sticky='W')
 
         # Image display label
         imgdisp_label = tk.Label(self, text="Frame display with background subtraction and cell detection")
@@ -165,10 +147,10 @@ class BrightfieldSCTGUI(tk.Toplevel):
         self.name_label.grid(row=2, column=2, rowspan=1, columnspan=2, padx=5, pady=5)
         # Original image canvas
         self.img_canvas = tk.Canvas(self, width=300, height=300)
-        self.img_canvas.grid(row=3, column=2, rowspan=4, padx=5, pady=5)
+        self.img_canvas.grid(row=3, column=2, rowspan=3, padx=5, pady=5)
         # Manipulated image canvas
         self.manip_canvas = tk.Canvas(self, width=300, height=300)
-        self.manip_canvas.grid(row=3, column=3, rowspan=4, padx=5, pady=5)
+        self.manip_canvas.grid(row=3, column=3, rowspan=3, padx=5, pady=5)
         # Scale
         self.img_scale = tk.Scale(self, orient='horizontal', from_=1, to=1,
                                  command=self.managescale)  # Default end value 1, will update when video chosen
@@ -206,7 +188,7 @@ class BrightfieldSCTGUI(tk.Toplevel):
 
         # Quit button
         quit_button = tk.Button(self, text="Quit", command=self.on_closing)
-        quit_button.grid(row=9, column=4, padx=5, pady=5, sticky='E')
+        quit_button.grid(row=8, column=4, padx=5, pady=5, sticky='E')
 
         # Tkinter protocol for x close
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -221,7 +203,6 @@ class BrightfieldSCTGUI(tk.Toplevel):
         self.rowconfigure(6, weight=1)
         self.rowconfigure(7, weight=1)
         self.rowconfigure(8, weight=1)
-        self.rowconfigure(9, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=2)
@@ -251,9 +232,21 @@ class BrightfieldSCTGUI(tk.Toplevel):
         frames = gray(pims.PyAVReaderTimed(filename))
         frame_count = len(frames)
 
+        # Generate map of all signal to assist with fluorescent ROI selection
+        map = sum(frames)  # Sum along layer axis
+        map_scaled = map * 255 // map.max()  # Scale max. value to 255
+        map_scaled_img = map_scaled.astype(np.uint8)  # Convert to uint8
+
+        # Apply a threshold
+        threshold = np.percentile(map_scaled_img,
+                                  10)  # Create a threshold by selecting signal above the 50th percentile
+        d_c_ret, img_for_roi = cv2.threshold(map_scaled_img, threshold, 255,
+                                             cv2.THRESH_BINARY)  # Apply binary threshold to create final map
+        # Something like an Otsu threshold won't work because most of the signal is very light
+
         # Choose ROI
         # From last window, sometimes video quality can be spotty as recording starts
-        self.chooseroi(frames[frame_count-1])
+        self.chooseroi(img_for_roi)
 
         # Create background subtractor for analysis
         fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=False)
@@ -359,7 +352,7 @@ class BrightfieldSCTGUI(tk.Toplevel):
         # Locate particles (ideally, cells) using Trackpy
         # See walkthrough: http://soft-matter.github.io/trackpy/dev/tutorial/walkthrough.html
         # Invert false - bg removal
-        f = tp.locate(img, self.maxdiameter.get(), minmass=self.minintensity.get(), invert=False)
+        f = tp.locate(img, self.maxdiameter.get(), minmass=3000, invert=False)
 
         if f is not None:  # If any cells found
 
@@ -392,7 +385,7 @@ class BrightfieldSCTGUI(tk.Toplevel):
 
         self.analysisbool.set(True)  # Indicate analysis has been run
 
-        an.RunBFSCTAnalysis.analysis(
+        an.RunFlSCTAnalysis.analysis(
                     self,
                     filelist,
                     frames_crop,
@@ -400,7 +393,6 @@ class BrightfieldSCTGUI(tk.Toplevel):
                     self.umpix.get(),
                     self.fps.get(),
                     self.maxdiameter.get(),
-                    self.minintensity.get(),
                     self.search_range.get(),
                     self.min_dist.get(),
                     self.x.get(),
@@ -431,12 +423,11 @@ class BrightfieldSCTGUI(tk.Toplevel):
 
             # Run all export options
             # Numerical data
-            an.RunBFSCTAnalysis.expnum(self,
+            an.RunFlSCTAnalysis.expnum(self,
                     filelist,
                     self.umpix.get(),
                     self.fps.get(),
                     self.maxdiameter.get(),
-                    self.minintensity.get(),
                     self.search_range.get(),
                     self.min_dist.get(),
                     self.x.get(),
@@ -444,7 +435,7 @@ class BrightfieldSCTGUI(tk.Toplevel):
                     self.w.get(),
                     self.h.get())
             # Export graphs
-            an.RunBFSCTAnalysis.expgraph(self)
+            an.RunFlSCTAnalysis.expgraph(self)
 
         else:
             error.ErrorWindow(message='Please run analysis first')
@@ -454,7 +445,7 @@ class BrightfieldSCTGUI(tk.Toplevel):
 
         if self.analysisbool.get() is True:
             if self.analysis_exp_bool.get() is True:
-                an.RunBFSCTAnalysis.expimgs(self, frames_crop)
+                an.RunFlSCTAnalysis.expimgs(self, frames_crop)
             else:
                 error.ErrorWindow(message="Please export numerical data first")
         else:

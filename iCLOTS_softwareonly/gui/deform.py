@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-01 for version 1.0b1
@@ -117,7 +117,7 @@ class BrightfieldDeformGUI(tk.Toplevel):
         min_int.grid(row=5, column=1, padx=5, pady=5)
 
         # Help button
-        help_button = tk.Button(self, text="Help", command=self.help)
+        help_button = tk.Button(self, text="Tutorial", command=self.help)
         help_button.grid(row=8, column=0, padx=5, pady=5, sticky='W')
 
         # Image display label
@@ -150,7 +150,7 @@ class BrightfieldDeformGUI(tk.Toplevel):
         results_label.grid(row=3, column=4, padx=5, pady=5)
         # Export all button
         expall_button = tk.Button(
-            self, text="Export grahical and numerical results", command=self.expall)
+            self, text="Export graphical and numerical results", command=self.expall)
         expall_button.grid(row=4, column=4, padx=5, pady=5)
         # # Have temporarily removed option for individual type graph/numerical imports,
         # # will return in future versions
@@ -242,6 +242,8 @@ class BrightfieldDeformGUI(tk.Toplevel):
         # Call function to display image
         self.displayimg(filename)
 
+        self.analysisbool.set(False)  # Indicate analysis has been run
+
 
     # Choose ROI with microchannels
     def chooseroi(self, frame):
@@ -250,7 +252,7 @@ class BrightfieldDeformGUI(tk.Toplevel):
         toplevel immediately appears after selection of file(s)"""
 
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Image", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         x = int(r[0])  # Take result of selectROI and put into a variable
         y = int(r[1])  # " "
         w = int(r[2])  # " "
