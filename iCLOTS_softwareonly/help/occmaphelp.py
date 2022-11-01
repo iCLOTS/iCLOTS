@@ -24,7 +24,7 @@ class HelpDisplay(tk.Toplevel):
 
         # Widgets
         namelabel = tk.Label(self, text="Multi-scale microfluidic accumulation/occlusion application help\n"
-                                        "sub-application specialized for use with microchannels")
+                                        "sub-application specialized for use with full microfluidic device")
         namelabel.grid(row=0, column=0, pady=10, padx=10)
 
         # Text box
@@ -50,67 +50,54 @@ class HelpDisplay(tk.Toplevel):
         self.helptext.insert(tk.INSERT, u"""\
         iCLOTS is a free software created for the analysis of common hematology workflow image data
 
-        Microchannel accumulation/occlusion analysis GUI analyzes single or timeseries images
-        of cells adhered to one or many straight-channel portions of a microfluidic device
+        Microfluidic accumulation/occlusion analysis GUI analyzes single or timeseries images
+        of cells adhered to an any-dimension microfluidic device
         Accomodates red, blue, and/or green channels
-
+        
         Application relies heavily on skimage library region property analysis, tutorial available at:
         https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_regionprops.html
-
+        
         Input files:
-        --Application is designed to work with a single image or a folder of images (.jpg, .png, and/or .tif)
+        --Application is designed to work with a folder of images (.jpg, .png, and/or .tif)
         ----The same input parameters are applied to each image
-        ----Each image should consist of one or many straight portions of a microfluidic device
+        ----This code will work on a single image
         ----It's important that frames are labeled sequentially in timeseries order (i.e. 01, 02.. 10 vs. 1, 2... 10)
         ----After uploading one or several images, the user is prompted to choose an ROI from the first image
-        ------This ROI should contain the straight channel portions
         ------The same ROI is applied to all images, take care that all images represent the same field of view
-        --The algorithm relies on left-to-right indexing to form the channel regions to analyze
-        ----As such, channels should be perfectly horizontal
-        ------iCLOTS provides a video-editing rotation tool that does not affect aspect ratio
-        --In order to create a complete channel area to analyze, some fluorescence signal must be present
-        ---at every y pixel of the channel
-        ----Staining the channels, or some feature of the channel, like a cell layer, helps with this
-
+        
         Input parameters:
         --\u03bcm to pixel ratio: The ratio of microns (1e-6 m) to pixels for the image
         ----Use value = 1 for no conversion
         --Red, green, and/or blue threshold(s)
         ----Users may select which color channel(s) they would like to analyze
         ----After selection, a spinbox to choose a threshold for each channel appears
-
+        
         Output files
-        --Single pixel resolution
         --ROI from each image
         --The "map" used - the channel region(s) as detected
         --Images with image processing (threshold) steps applied
         ----For each frame, each selected color as detected by the set threshold overlaid on the channel map
-
+        
         --A corresponding .xlsx sheet containing:
         ----For each selected channel:
-        ------Raw data: A percent y-occlusion for very frame, channel, x-position within the channel
-        --------Percent y-occlusion indicates what percentage of the height of the microchannel contains signal
-        ------Channel data: Area of signal and signal accumulation (pixels, \u03bcm\u00b2)
-        -------and %y occlusion for each channel in each frame
-        ------Frame data: mean signal area, signal accumulation, and %y occlusion per frame (all channels)
+        ------Frame data: mean signal area, signal accumulation (all channels)
         ------Conversion notes:
         --------To convert accumulation per frame into per timepoint, divide frame # by FPS imaging rate
-        --------To convert x-pixel coordinate to a measurement, multiple by \u03bcm-to-pixel ratio)
         
         --Future versions of iCLOTS will include obstruction, the percent of the y-direction for each channel
         ---containing some signal
-
+        
         --Occlusion/accumulation graph:
         ----For the time series, a line graph showing:
-        ------Occlusion (titled, left) for each channel (light lines) and mean (dark lines) for each color
+        ------Occlusion (titled, left) for each color
         ------Accumulation (titled, right) - " "
-
+        
         Some tips from the iCLOTS team:
-
+        
         Computational and experimental methods:
-        --See input requirements: a time series, in the same field of view, with "complete" y-height horizontal channels
-        ----The left-to-right indexing to form the channels requires some signal at every height point in that channel
-        ------Consider staining the microfluidic channels
+        --See input requirements: a time series, in the same field of view, with "complete" signal
+        ----Creating the map requires some signal at every height point in that channel
+        ------Consider staining the microfluidic channels - if this isn't possible, you may benefit from the ROI app
         ------We are planning a brightfield/fluoresence microscopy combo. app for future iCLOTS releases
         --Time series images must be in the proper alphabetical/numerical order
         ----If image names contain numbers, use preceding zeros to order properly
@@ -122,13 +109,16 @@ class HelpDisplay(tk.Toplevel):
         ----We are happy to share the mask design files and instructions for fabrication upon request
         
         Choosing parameters:
-        --Be sure to use \u03bcm-to-pixel ratio, not pixel-to-\u03bcm ratio
+        --Be sure to use \u03bcm-to-pixel ratio, not \u03bcm-to-micron ratio
+        --If you indicate more than one color channel, you might find that colors overlap, and you can't accurately
+        ---see parameters as described
+        ----Individually choose each color, select a good threshold, and then combine with the thresholds you chose.
         --Depending on the threshold you set, while the "trend" of accumulation/occlusion will stay constant,
         ---the degree of accumulation/occlusion will decrease as threshold increases
         ----If you are comparing conditions, make sure they were taken with the same imaging settings
         -----and use the same threshold values
         ------Ideally these experiments are direct control-to-experimental comparisons taken on the same day
-
+        
         Output files:
         --Analysis files are named after the folder containing all images (.xlsx) or image names (.png)
         ----Avoid spaces, punctuation, etc. within file names
