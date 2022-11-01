@@ -1,7 +1,7 @@
 """iCLOTS is a free software created for the analysis of common hematology workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
-Last updated: 2021-12-02 for version 1.0b1
+Last updated: 2022-10-13 for version 1.0b1
 
 Resize file application resizes files for use with iCLOTS analysis applications:
 
@@ -20,6 +20,7 @@ Outputs:
 
 import tkinter as tk
 import tkinter.font as font
+from tkinter import messagebox
 import os
 import shutil
 import cv2
@@ -38,7 +39,7 @@ class ResizeGUI(tk.Toplevel):
         boldfont = font.Font(weight="bold")
 
         # Tkinter variables
-        self.resizefactor = tk.DoubleVar(value=1)  # micron-to-pixel ratio
+        self.resizefactor = tk.DoubleVar(value=1)
         self.filelist = None
 
         # Widgets
@@ -68,7 +69,7 @@ class ResizeGUI(tk.Toplevel):
         dir_button = tk.Button(self, text="Submit for resizing", command=self.resize)
         dir_button.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
         # Quit button
-        quit_button = tk.Button(self, text="Quit", command=self.destroy)
+        quit_button = tk.Button(self, text="Quit", command=self.on_closing)
         quit_button.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 
         self.rowconfigure(0, weight=1)
@@ -81,16 +82,19 @@ class ResizeGUI(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
+        # Tkinter protocol for x close
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     # Choose single image, return one-element list
     def singlefile(self):
         filename = chooseinput.anyfile()
         self.filelist = [filename]
-        self.name_label.config(text=filename)
+        self.name_label.config(text=os.path.basename(filename))
 
     # Choose folder of images, return sorted list
     def dirfile(self):
         dirname, self.filelist = chooseinput.diranyfile()
-        self.name_label.config(text=dirname)
+        self.name_label.config(text=os.path.basename(dirname))
 
     # Resize each file
     def resize(self):
@@ -98,7 +102,8 @@ class ResizeGUI(tk.Toplevel):
             # Format resize factor into string
             rf_str = str(self.resizefactor.get()).replace(".", "p")
             # Make new directory to save images into, change directory
-            outputfolder = os.path.dirname(self.filelist[0]) + '/Resized files, resize factor ' + rf_str
+
+            outputfolder = os.path.join(os.path.dirname(self.filelist[0]), 'Resized files, resize factor ' + rf_str)
             if os.path.exists(outputfolder):  # Set up outut folder
                 shutil.rmtree(outputfolder)
             os.mkdir(outputfolder)
@@ -140,3 +145,15 @@ class ResizeGUI(tk.Toplevel):
 
         else:
             error.ErrorWindow(message='Please select file(s) to resize')
+
+    # Closing command, clear variables
+    def on_closing(self):
+        """Closing command, clear variables to improve speed"""
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+            # Clear variables
+            filelist = None
+            cap = None
+            out = None
+            resizedimg = None
+            read = None
