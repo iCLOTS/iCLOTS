@@ -1,7 +1,7 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
-Last updated: 2022-06-29 for version 1.0b1
+Last updated: 2022-10-26 for version 1.0b1
 
 Video menu script directs to iCLOTS video editing applications
 These are useful for preparing data for analysis
@@ -10,7 +10,8 @@ These are useful for preparing data for analysis
 
 import tkinter as tk
 import tkinter.font as font
-from videoedit import resizeapp, cropframeapp
+from videoedit import resizeapp, rotateapp, croplengthapp, video_imgapp, img_videoapp, normalize_folderapp, cropframeapp, contrastapp
+from help import videohelp as hp
 from accessoryfn import staytuned
 
 class VideoMenu(tk.Toplevel):
@@ -58,7 +59,7 @@ class VideoMenu(tk.Toplevel):
         norm_int_button = tk.Button(self, text="Normalize intensity of a folder of files", command=self.norm_int)
         norm_int_button.grid(row=8, column=0, padx=5, pady=5)
         # Help window
-        help_button = tk.Button(self, text="Help, all applications", command=self.help)
+        help_button = tk.Button(self, text="Tutorial, all applications", command=self.help)
         help_button.grid(row=9, column=0, padx=5, pady=5)
         # Quit button
         quit_button = tk.Button(self, text="Quit", command=self.destroy)
@@ -82,25 +83,26 @@ class VideoMenu(tk.Toplevel):
         resizeapp.ResizeGUI()
 
     def rotateapp(self):
-        staytuned.StayTuned()
+        rotateapp.RotateGUI()
 
     def contrastapp(self):
-        staytuned.StayTuned()
+        contrastapp.EditContrastGUI()
 
     def croproi(self):
-        cropframeapp.CropROIGUI()
+        cropframeapp.CropFrames()
 
     def croplength(self):
-        staytuned.StayTuned()
+        croplengthapp.CropLengthGUI()
 
     def img_video(self):
-        staytuned.StayTuned()
+        img_videoapp.ImgtoVideo()
 
     def video_img(self):
-        staytuned.StayTuned()
+        video_imgapp.VideoToImg()
 
     def norm_int(self):
-        staytuned.StayTuned()
+        normalize_folderapp.NormalizeImgs()
 
     def help(self):
-        staytuned.StayTuned()
+        # Open help window
+        hp.HelpDisplay()

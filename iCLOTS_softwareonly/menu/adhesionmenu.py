@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-04 for version 1.0b1
@@ -10,8 +10,7 @@ and filopodia counting iCLOTS applications
 
 import tkinter as tk
 import tkinter.font as font
-from gui import adhfluor, adhbrightfield, adhfil
-from accessoryfn import staytuned
+from gui import adhfluor, adhbrightfield, adhfil, adhvideo
 
 class AdhesionMenu(tk.Toplevel):
 
@@ -67,4 +66,4 @@ class AdhesionMenu(tk.Toplevel):
         adhfil.FilAdhesionGUI()
 
     def ta_app(self):
-        staytuned.StayTuned()
+        adhvideo.AdhesionVideoGUI()

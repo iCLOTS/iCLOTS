@@ -12,6 +12,7 @@ import tkinter.font as font
 import sys
 import os
 from PIL import Image, ImageTk
+from gui import ml_selectfiles, velocity
 from menu import adhesionmenu, occlusionmenu, sct_menu, videomenu
 from help import mainhelp
 from accessoryfn import staytuned
@@ -24,9 +25,8 @@ class MainMenu(tk.Tk):
         # App details, subject to change
         name = 'iCLOTS'
         name_ext = 'interactive Cellular assay Labeled\nObservation and Tracking experimental Software'
-        tagline = 'Automated analysis software for\nhematology and microfluidic applications'
-        # version = 'v1.0b1'
-        version = 'Pre-release'
+        tagline = 'Automated analysis software for\ncellular microscopy and microfluidic applications'
+        version = 'v1.0b1'
 
         # Fonts
         titlefont = font.Font(size=24)
@@ -75,7 +75,7 @@ class MainMenu(tk.Tk):
         video_button.grid(row=10, column=0, columnspan=3, padx=5, pady=5)
 
         # Help button
-        help_button = tk.Button(self, text="Help", command=self.gethelp)
+        help_button = tk.Button(self, text="Tutorial", command=self.gethelp)
         help_button.grid(row=12, column=0, padx=5, pady=5)
         # Version, Lam lab text
         lamlab_label = tk.Label(self, text=version +", Lam Lab")
@@ -113,14 +113,13 @@ class MainMenu(tk.Tk):
         occlusionmenu.OcclusionMenu()
 
     def velapp(self):
-        staytuned.StayTuned()
+        velocity.VelocityGUI()
 
     def videomenu(self):
-        # videomenu.VideoMenu()
-        staytuned.StayTuned()
+        videomenu.VideoMenu()
 
     def clustermenu(self):
-        staytuned.StayTuned()
+        ml_selectfiles.SelectExcel()
 
     def gethelp(self):
         mainhelp.HelpDisplay()

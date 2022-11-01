@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-06-29 for version 1.0b1
@@ -12,7 +12,7 @@ All applications are designed for RGB fluorescent data only
 
 import tkinter as tk
 import tkinter.font as font
-from gui import occmicro
+from gui import occmicro, occroi, occdevice
 from accessoryfn import staytuned
 
 class OcclusionMenu(tk.Toplevel):
@@ -56,10 +56,10 @@ class OcclusionMenu(tk.Toplevel):
         self.columnconfigure(0, weight=1)
 
     def ufapp(self):
-        staytuned.StayTuned()
+        occdevice.DeviceOccGUI()
 
     def roiapp(self):
-        staytuned.StayTuned()
+        occroi.ROIOccGUI()
 
     def ucapp(self):
         occmicro.MicrochannelOccGUI()
