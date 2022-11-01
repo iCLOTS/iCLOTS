@@ -1,9 +1,9 @@
 """iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
-Last updated: 2022-08-01 for version 1.0b1
+Last updated: 2022-11-01 for version 1.0b1
 
-Series of functions that handles analysis for brightfield deformability application
+Series of functions that handles analysis for brightfield single cell tracking application
 
 """
 
@@ -14,6 +14,7 @@ import cv2
 from PIL import Image, ImageTk, ImageDraw
 import numpy as np
 import pandas as pd
+import math
 import trackpy as tp
 import warnings
 warnings.filterwarnings("ignore", module="trackpy")
@@ -22,12 +23,12 @@ import seaborn as sns
 import datetime
 import shutil
 
-class RunBFDefAnalysis():
+class RunBFSCTAnalysis():
 
-    def __init__(self, filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, x, y, w, h):
-        super().__init__(filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, x, y, w, h)
+    def __init__(self, filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, search_range, min_dist, x, y, w, h):
+        super().__init__(filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, search_range, min_dist, x, y, w, h)
 
-    def analysis(self, filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, x, y, w, h):
+    def analysis(self, filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, search_range, min_dist, x, y, w, h):
         """Function runs final analysis based on the parameters chosen in GUI"""
 
         # Global variables for use with additional export functions within class
@@ -49,7 +50,7 @@ class RunBFDefAnalysis():
         # Link particles, cells into dataframe format
         # Search range criteria: must travel no further than 1/3 the channel length in one frame
         # Memory here signifies a particle/cell cannot "disappear" for more than one frame
-        tr = tp.link_df(f, search_range=self.w.get() / 3, memory=1, adaptive_stop=1, adaptive_step=0.95)
+        tr = tp.link_df(f, search_range=self.search_range.get(), memory=1, adaptive_stop=1, adaptive_step=0.95)
         # Filter stubs criteria requires a particle/cell to be present for at least three frames
         t_final = tp.filter_stubs(tr, 3)
 
@@ -66,15 +67,17 @@ class RunBFDefAnalysis():
             df_p = tr[tr['particle'] == p]  # Region of trackpy dataframe corresponding to individual particle index
             x_0 = df_p['x'].iloc[0]  # First x-position
             x_n = df_p['x'].iloc[-1]  # Last x-position
+            y_0 = df_p['y'].iloc[0]  # First y-position
+            y_n = df_p['y'].iloc[-1]  # Last y-position
             f_0 = df_p['frame'].iloc[0]  # First frame number
             f_n = df_p['frame'].iloc[-1]  # Last frame number
             s = df_p['mass'].mean() / 255  # Area of cell (pixels)
-            d = (x_n - x_0)  # Distance (pixels) - x direction only
+            d = math.sqrt((x_n - x_0) ** 2 + (y_n - y_0) ** 2)  # Distance (pixels) - x direction only
             t = (f_n - f_0) / float(self.fps.get())  # Time (seconds)
             # Criteria to save cells as a valid data point:
             # Must travel no less than 1/3 the length of channel
             # Must travel no further than length of channel
-            if d < self.w.get() and d > self.w.get() / 3:
+            if d > self.min_dist.get() / 3:
                 t_sdi = t_sdi.append(df_p, ignore_index=True)  # Save trackpy metrics
                 # Append data for particle/cell
                 p_i.append(p)
@@ -113,7 +116,7 @@ class RunBFDefAnalysis():
 
         # If cells exist within the image
         if len(f) != 0:
-            # Subplot 212 (circularity hist)
+            # Subplot 212
             plt.subplot(2, 1, 1)
             plt.hist(df_video['Velocity (\u03bcm/s)'], rwidth=0.8, color='orangered')
             plt.xlabel('Velocity (\u03bcm/s)')
@@ -149,7 +152,7 @@ class RunBFDefAnalysis():
 
         GraphTopLevel(df_img)  # Raise graph window
 
-    def expnum(self, filelist, umpix, fps, maxdiameter, minintensity, x, y, w, h):
+    def expnum(self, filelist, umpix, fps, maxdiameter, minintensity, search_range, min_dist, x, y, w, h):
         """Export numerical (excel) data, including descriptive statistics and parameters used"""
 
         writer = pd.ExcelWriter(video_basename + '_analysis.xlsx',
@@ -169,7 +172,9 @@ class RunBFDefAnalysis():
         param_df = pd.DataFrame({'Ratio, \u03bcm-to-pixels': umpix,
                                  'FPS': fps,
                                  'Maximum cell diameter (px)': maxdiameter,
-                                 'Minimum cell intensity': minintensity,
+                                 'Minimum cell intensity (a.u.)': minintensity,
+                                 'Search range (px)': search_range,
+                                 'Min. dist. traveled (px)': min_dist,
                                  'ROI x': x,
                                  'ROI y': y,
                                  'ROI w': w,
@@ -270,6 +275,14 @@ def descriptive_statistics(df_input):
     """Function to calculate descriptive statistics for each population, represented as a dataframe"""
 
     dict = {'n cells': len(df_input),
+                  u'Min. distance (\u03bcm)': df_input['Distance traveled (\u03bcm)'].min(),
+                  u'Mean distance (\u03bcm)': df_input['Distance traveled (\u03bcm)'].mean(),
+                  u'Max. distance (\u03bcm)': df_input['Distance traveled (\u03bcm)'].max(),
+                  u'Stdev, distance (\u03bcm)': df_input['Distance traveled (\u03bcm)'].std(),
+                  u'Min. transit time (s)': df_input['Transit time (s)'].min(),
+                  u'Mean transit time (s)': df_input['Transit time (s)'].mean(),
+                  u'Max. transit time (s)': df_input['Transit time (s)'].max(),
+                  u'Stdev, transit time (s)': df_input['Transit time (s)'].std(),
                   u'Min. velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].min(),
                   u'Mean velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].mean(),
                   u'Max. velocity (\u03bcm/s)': df_input['Velocity (\u03bcm/s)'].max(),
