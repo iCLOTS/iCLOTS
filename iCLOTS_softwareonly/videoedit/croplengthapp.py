@@ -15,7 +15,7 @@ import shutil
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
-import pims
+# import pims
 from accessoryfn import chooseinput, error, complete
 
 class CropLengthGUI(tk.Toplevel):
@@ -100,14 +100,37 @@ class CropLengthGUI(tk.Toplevel):
         self.filename = chooseinput.videofile()
         self.name_label.config(text=os.path.basename(self.filename))
 
+        # # Create set of frames
+        # # Defining a function to grayscale the image
+        # @pims.pipeline
+        # def gray(image):
+        #     return image[:, :, 1]
+        #
+        # # Create a frames object using pims
+        # self.frames = gray(pims.PyAVReaderTimed(self.filename))
+        # frame_count = len(self.frames)
+
         # Create set of frames
         # Defining a function to grayscale the image
-        @pims.pipeline
-        def gray(image):
-            return image[:, :, 1]
+        # @pims.pipeline
+        # def gray(image):
+        #     return image[:, :, 1]
+        #
+        # # Create a frames object using pims
+        # self.frames = gray(pims.PyAVReaderTimed(self.filename))
 
-        # Create a frames object using pims
-        self.frames = gray(pims.PyAVReaderTimed(self.filename))
+        cap = cv2.VideoCapture(self.filename)  # Capture video
+        n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Record number of frames within video
+
+        fc = 0
+        self.frames = []
+        ret = True  # Initialize "true" value for video processing loop
+        while fc < n_frames and ret:
+            ret, frame = cap.read()  # Read the video capture object
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Read as gray/one layer
+            self.frames.append(gray)
+            fc += 1  # Update count after frame is processed
+
         frame_count = len(self.frames)
 
         # Configure scale

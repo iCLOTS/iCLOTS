@@ -75,8 +75,9 @@ class CropFrames(tk.Toplevel):
         """Function to resize a frame - can be an image file or a video frame"""
 
         # Choose ROI from image, pull out values
+        cv2.namedWindow("Select region of interest and press enter", cv2.WINDOW_NORMAL)
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Image", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest and press enter", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         ROI_x = int(r[0])  # Take result of selectROI and put into a variable
         ROI_y = int(r[1])  # " "
         ROI_w = int(r[2])  # " "
