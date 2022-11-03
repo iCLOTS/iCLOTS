@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from PIL import Image, ImageTk, ImageDraw
 from help import mlhelp as hp
+import os
 from accessoryfn import error
 from gui import ml_clustering as cl
 
@@ -87,9 +88,9 @@ class SelectNClusters(tk.Toplevel):
         self.rowconfigure(2, weight=1)
         self.rowconfigure(3, weight=1)
         self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
 
         # Display scree plot
         self.displaygraph()
@@ -129,6 +130,7 @@ class SelectNClusters(tk.Toplevel):
 
     def select_clusters(self):
         cl.ApplyClustering(self.df, self.dirname, self.final_features, self.clusters.get())  # Raise graph window
+        print('test')
 
     # Open help window
     def help(self):

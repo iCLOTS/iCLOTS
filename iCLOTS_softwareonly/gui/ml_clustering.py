@@ -20,6 +20,7 @@ from sklearn import metrics
 import itertools
 from PIL import Image, ImageTk, ImageDraw
 from help import mlhelp as hp
+import os
 
 
 class ApplyClustering(tk.Toplevel):

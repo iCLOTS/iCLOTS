@@ -32,6 +32,9 @@ class SelectExcel(tk.Toplevel):
         boldfont = font.Font(weight="bold")
         smallfont = font.Font(size=8)
 
+        self.df = []
+        self.dirname = []
+
         # Widgets
         self.title(name + " machine learning")
 
@@ -108,7 +111,9 @@ class SelectExcel(tk.Toplevel):
 
             if trigger_error is False:
                 # Call next window: correlation matrix/variable selection
-                sf.SelectFeatures(self.df, self.dirname)  # Raise graph window
+                # print(output_folder)
+                # sf.SelectFeatures(self.df, self.dirname, output_folder)  # Raise graph window
+                sf.SelectFeatures(self.df, self.dirname)
 
         else:
             error.ErrorWindow(message='No excel sheets included')

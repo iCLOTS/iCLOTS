@@ -213,6 +213,7 @@ class ROIOccGUI(tk.Toplevel):
 
         self.analysisbool.set(False)  # Indicate analysis has been run
         self.img_scale.grid_forget()
+        self.img_scale.set(0)
 
     # Choose folder of images, return sorted list
     def dirfile(self):
@@ -241,9 +242,10 @@ class ROIOccGUI(tk.Toplevel):
         toplevel immediately appears after selection of file(s)"""
 
         # Read image
+        cv2.namedWindow("Select region of interest and press enter", cv2.WINDOW_NORMAL)
         imgarray = cv2.imread(roiimage)
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Select region of interest", imgarray, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest and press enter", imgarray, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         x = int(r[0])  # Take result of selectROI and put into a variable
         y = int(r[1])  # " "
         w = int(r[2])  # " "

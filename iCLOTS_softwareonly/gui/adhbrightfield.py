@@ -203,6 +203,7 @@ class BrightfieldAdhesionGUI(tk.Toplevel):
 
         self.analysisbool.set(False)  # Indicate analysis has been run
         self.img_scale.grid_forget()
+        self.img_scale.set(0)
 
     # Choose folder of images, return sorted list
     def dirfile(self):

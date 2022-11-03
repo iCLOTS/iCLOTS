@@ -19,12 +19,14 @@ from help import mlhelp as hp
 from accessoryfn import error
 from gui import ml_selectclusters as snc
 
+
 class SelectFeatures(tk.Toplevel):
     def __init__(self, df, dirname):
         super().__init__()
 
         self.df = df
         self.dirname = dirname
+        self.final_features = []  # Init.
 
         name = "iCLOTS"
         # Fonts
@@ -109,7 +111,6 @@ class SelectFeatures(tk.Toplevel):
         plt.close()
 
     def select_features(self):
-        self.final_features = []  # Init.
         for var in self.var_categories:  # Save features where value is true
             if self.var_categories[var].get() is True:
                 self.final_features.append(var)
@@ -120,6 +121,7 @@ class SelectFeatures(tk.Toplevel):
         else:
             # Call next window: correlation matrix/variable selection
             snc.SelectNClusters(self.df, self.dirname, self.final_features)  # Raise graph window
+            print('test')
 
 
 

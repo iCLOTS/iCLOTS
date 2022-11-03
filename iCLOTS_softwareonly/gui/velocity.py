@@ -291,8 +291,9 @@ class VelocityGUI(tk.Toplevel):
 
         toplevel immediately appears after selection of file(s)"""
 
+        cv2.namedWindow("Select region of interest and press enter", cv2.WINDOW_NORMAL)
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Select region of interest", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest and press enter", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         x = int(r[0])  # Take result of selectROI and put into a variable
         y = int(r[1])  # " "
         w = int(r[2])  # " "

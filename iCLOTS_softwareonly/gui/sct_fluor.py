@@ -13,7 +13,7 @@ from tkinter import messagebox
 import tkinter.font as font
 import os
 import cv2
-import pims
+# import pims
 import trackpy as tp
 import warnings
 warnings.filterwarnings("ignore", module="trackpy")
@@ -53,7 +53,7 @@ class FluorSCTGUI(tk.Toplevel):
 
         # Widgets
         # self.title(name + " brightfield deformability analysis")
-        self.title(name + " single cell tracking analysis")
+        self.title(name + " single cell tracking analysis, fluorescence microscopy")
 
         # Input single video button
         single_video = tk.Button(self, text="Select single video", command=self.singlefile)
@@ -222,15 +222,27 @@ class FluorSCTGUI(tk.Toplevel):
         # self.inputtype.set(True)
         self.single_label.config(text=filename)
 
-        # Create set of frames
-        # Defining a function to grayscale the image
-        @pims.pipeline
-        def gray(image):
-            return image[:, :, 1]
+        # # Create set of frames
+        # # Defining a function to grayscale the image
+        # @pims.pipeline
+        # def gray(image):
+        #     return image[:, :, 1]
+        #
+        # # Create a frames object using pims
+        # frames = gray(pims.PyAVReaderTimed(filename))
+        # frame_count = len(frames)
 
-        # Create a frames object using pims
-        frames = gray(pims.PyAVReaderTimed(filename))
-        frame_count = len(frames)
+        cap = cv2.VideoCapture(filename)  # Capture video
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Record number of frames within video
+
+        fc = 0
+        frames = []
+        ret = True  # Initialize "true" value for video processing loop
+        while fc < frame_count and ret:
+            ret, frame = cap.read()  # Read the video capture object
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Read as gray/one layer
+            frames.append(gray)
+            fc += 1  # Update count after frame is processed
 
         # Generate map of all signal to assist with fluorescent ROI selection
         map = sum(frames)  # Sum along layer axis
@@ -281,8 +293,9 @@ class FluorSCTGUI(tk.Toplevel):
 
         toplevel immediately appears after selection of file(s)"""
 
+        cv2.namedWindow("Select region of interest and press enter", cv2.WINDOW_NORMAL)
         fromCenter = False  # Set up to choose as a drag-able rectangle rather than a rectangle chosen from center
-        r = cv2.selectROI("Select region of interest", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
+        r = cv2.selectROI("Select region of interest and press enter", frame, fromCenter)  # Choose ROI function from cv2 - opens a window to choose
         x = int(r[0])  # Take result of selectROI and put into a variable
         y = int(r[1])  # " "
         w = int(r[2])  # " "
