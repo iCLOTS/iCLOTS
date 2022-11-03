@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-04 for version 1.0b1
@@ -148,7 +148,7 @@ class HelpDisplay(tk.Toplevel):
         --Issues with software, requests for help troubleshooting, new application ideas, and general comments, suggestions, 
         ---and concerns are all welcome
         --The authors hope this will become a field-wide effort to improve quantitative data analysis precision 
-        for common cell microscopy-based assays, particularly microfluidic assay
+        for common cell microscopy-based assays, particularly microfluidic assays
         
         Thanks for being an iCLOTS user!"""
                              )
