@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-05 for version 1.0b1
@@ -265,7 +265,8 @@ class RunAdhFilAnalysis():
         if len(filelist) == 1:  # Single file
             nameconvention = os.path.basename(filelist[0]).split(".")[0]
         elif len(filelist) > 1:  # Directory of files
-            nameconvention = os.path.dirname(filelist[0]).split("/")[-1]
+            nameconvention_d = os.path.dirname(filelist[0])
+            nameconvention = os.path.basename(nameconvention_d)
 
         # Create writer to save   to
         writer = pd.ExcelWriter(nameconvention[0:14] + '_analysis.xlsx', engine='openpyxl')  # Crop to avoid excel error
@@ -316,7 +317,7 @@ class RunAdhFilAnalysis():
 
         # Create timestamped results directory
         current_dir = os.getcwd()  # Select filepath
-        if current_dir.split('/')[-1] == 'Results, labeled image data':
+        if os.path.basename(current_dir) == 'Results, labeled image data':
             current_dir = os.path.dirname(current_dir)
         graph_folder = os.path.join(current_dir, 'Results, graphical data')
 
@@ -373,7 +374,7 @@ class RunAdhFilAnalysis():
 
         current_dir = os.getcwd()  # Select filepath
 
-        if current_dir.split('/')[-1] == 'Results, graphical data':
+        if os.path.basename(current_dir) == 'Results, graphical data':
             current_dir = os.path.dirname(current_dir)
         img_folder = os.path.join(current_dir, 'Results, labeled image data')
 
