@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-01 for version 1.0b1
@@ -108,7 +108,7 @@ class BrightfieldAdhesionGUI(tk.Toplevel):
         min_int.grid(row=7, column=1, padx=5, pady=5)
 
         # Help button
-        help_button = tk.Button(self, text="Help", command=self.help)
+        help_button = tk.Button(self, text="Tutorial", command=self.help)
         help_button.grid(row=10, column=0, padx=5, pady=5, sticky='W')
 
         # Image display label
@@ -201,6 +201,10 @@ class BrightfieldAdhesionGUI(tk.Toplevel):
         # Call function to display image
         self.displayimg(filename)
 
+        self.analysisbool.set(False)  # Indicate analysis has been run
+        self.img_scale.grid_forget()
+        self.img_scale.set(0)
+
     # Choose folder of images, return sorted list
     def dirfile(self):
         """Call a toplevel GUI to choose a folder of image files"""
@@ -219,6 +223,8 @@ class BrightfieldAdhesionGUI(tk.Toplevel):
         # Configure scale
         self.img_scale['to'] = len(filelist)
         self.img_scale.grid(row=9, column=2, columnspan=2, padx=5, pady=5)
+
+        self.analysisbool.set(False)  # Indicate analysis has been run
 
     # Select colors
     def invertchoice(self):
