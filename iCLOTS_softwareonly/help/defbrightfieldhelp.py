@@ -1,4 +1,4 @@
-"""iCLOTS is a free software created for the analysis of common hematology workflow image data
+"""iCLOTS is a free software created for the analysis of common hematology and/or microfluidic workflow image data
 
 Author: Meredith Fay, Lam Lab, Georgia Institute of Technology and Emory University
 Last updated: 2022-08-04 for version 1.0b1
@@ -48,7 +48,7 @@ class HelpDisplay(tk.Toplevel):
 
         # Making the text read only
         self.helptext.insert(tk.INSERT, u"""\
-        iCLOTS is a free software created for the analysis of common hematology workflow image data
+        iCLOTS is a free software created for the analysis of common microfluidic and hematology workflow image data
 
         Brightfield deformability application is a subset of the single cell tracking algorithms
         that has been designed for specific use with the Lam lab 
@@ -75,6 +75,7 @@ class HelpDisplay(tk.Toplevel):
         Input files:
         --Application is designed to analyze a single video (.avi)
         ----The same input parameters are applied to each image
+        ----If your data is saved as a series of frames, please convert to .avi using the video processing tools
         ----Video is displayed in the center of the analysis window
         ------Users can scroll through frames using the scale bar below
         --Users are automatically lead to choose a region of interest from the video for analysis
@@ -98,7 +99,7 @@ class HelpDisplay(tk.Toplevel):
         ------It is useful for troubleshooting outliers, etc.
 
         --A corresponding .xlsx sheet containing:
-        ----Area (pixels) and sDI (\u03bcm) per cell
+        ----Area (pixels) and sDI (\u03bcm/s) per cell
         ------Start frame, end frame, distance traveled, and transit time are also provided
         ------Image processing algorithms applied to the video can make cells appear artificially large
         ------Area in pixels is a relative measurement        
@@ -162,7 +163,7 @@ class HelpDisplay(tk.Toplevel):
         --Issues with software, requests for help troubleshooting, new application ideas, and general comments, suggestions, 
         ---and concerns are all welcome
         --The authors hope this will become a field-wide effort to improve quantitative data analysis precision 
-        for common cell microscopy-based assays, particularly microfluidic assay
+        for common cell microscopy-based assays, particularly microfluidic assays
 
         Thanks for being an iCLOTS user!"""
                              )
